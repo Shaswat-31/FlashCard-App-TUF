@@ -33,6 +33,7 @@ const Dashboard = () => {
       fetchFlashcards();
       setNewCard({ question: "", answer: "" });
       onClose();
+      window.location.reload(false);
     } catch (error) {
       console.error("Error adding flashcard:", error);
     }
@@ -44,6 +45,7 @@ const Dashboard = () => {
       fetchFlashcards();
       setEditCard({ id: null, question: "", answer: "" });
       onClose();
+      window.location.reload(false);
     } catch (error) {
       console.error("Error updating flashcard:", error);
     }
@@ -54,6 +56,7 @@ const Dashboard = () => {
       await axios.delete(`https://flashcard-app-tuf.onrender.com/api/flashcards/${id}`);
       fetchFlashcards();
       onClose();
+      window.location.reload(false);
     } catch (error) {
       console.error("Error deleting flashcard:", error);
     }
