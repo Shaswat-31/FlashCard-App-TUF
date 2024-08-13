@@ -1,16 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Input, useDisclosure, Box, Text, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
+import {
+  Button,
+  Input,
+  useDisclosure,
+  Box,
+  Spinner,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
+  AccordionPanel,
+} from "@chakra-ui/react";
 import CustomAlertDialog from "./CustomAlertDialog";
 import { AddIcon } from "@chakra-ui/icons";
 
 const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [newCard, setNewCard] = useState({ question: "", answer: "" });
-  const [editCard, setEditCard] = useState({ id: null, question: "", answer: "" });
+  const [editCard, setEditCard] = useState({
+    id: null,
+    question: "",
+    answer: "",
+  });
   const [selectedCard, setSelectedCard] = useState(null);
   const [dialogType, setDialogType] = useState(""); // "add", "edit", "delete"
   const [showFlashcards, setShowFlashcards] = useState(true);
+  const [loading, setLoading] = useState(true); // New state for loading
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -20,16 +36,23 @@ const Dashboard = () => {
 
   const fetchFlashcards = async () => {
     try {
-      const response = await axios.get("https://flashcard-app-tuf.onrender.com/api/flashcards");
+      const response = await axios.get(
+        "https://flashcard-app-tuf.onrender.com/api/flashcards"
+      );
       setFlashcards(response.data);
     } catch (error) {
       console.error("Error fetching flashcards:", error);
+    } finally {
+      setLoading(false); // Set loading to false after data is fetched
     }
   };
 
   const handleAdd = async () => {
     try {
-      await axios.post("https://flashcard-app-tuf.onrender.com/api/flashcards", newCard);
+      await axios.post(
+        "https://flashcard-app-tuf.onrender.com/api/flashcards",
+        newCard
+      );
       fetchFlashcards();
       setNewCard({ question: "", answer: "" });
       onClose();
@@ -41,7 +64,10 @@ const Dashboard = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`https://flashcard-app-tuf.onrender.com/api/flashcards/${editCard.id}`, editCard);
+      await axios.put(
+        `https://flashcard-app-tuf.onrender.com/api/flashcards/${editCard.id}`,
+        editCard
+      );
       fetchFlashcards();
       setEditCard({ id: null, question: "", answer: "" });
       onClose();
@@ -52,8 +78,10 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id) => {
-    try {      
-      await axios.delete(`https://flashcard-app-tuf.onrender.com/api/flashcards/${id}`);
+    try {
+      await axios.delete(
+        `https://flashcard-app-tuf.onrender.com/api/flashcards/${id}`
+      );
       fetchFlashcards();
       onClose();
       window.location.reload(false);
@@ -66,7 +94,11 @@ const Dashboard = () => {
     setDialogType(type);
     setSelectedCard(card);
     if (type === "edit") {
-      setEditCard({ id: card.id, question: card.question, answer: card.answer });
+      setEditCard({
+        id: card.id,
+        question: card.question,
+        answer: card.answer,
+      });
     }
     onOpen();
   };
@@ -90,13 +122,22 @@ const Dashboard = () => {
           </Button>
         </div>
 
-        {showFlashcards && (
+        {loading ? (
+          <Spinner
+            size="xl"
+            color="teal.500"
+            thickness="4px"
+            emptyColor="gray.200"
+            speed="0.65s"
+            label="Loading"
+          />
+        ) : showFlashcards && (
           <Accordion allowToggle>
             {flashcards.map((card) => (
               <AccordionItem key={card.id}>
                 <h2>
                   <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
+                    <Box as="span" flex="1" textAlign="left">
                       <h1> {card.question} </h1>
                     </Box>
                     <AccordionIcon />
@@ -105,10 +146,16 @@ const Dashboard = () => {
                 <AccordionPanel pb={4}>
                   <h1>{card.answer}</h1>
                   <div className="space-x-2 mt-2">
-                    <Button colorScheme="teal" onClick={() => openDialog("edit", card)}>
+                    <Button
+                      colorScheme="teal"
+                      onClick={() => openDialog("edit", card)}
+                    >
                       Edit
                     </Button>
-                    <Button colorScheme="red" onClick={() => openDialog("delete", card)}>
+                    <Button
+                      colorScheme="red"
+                      onClick={() => openDialog("delete", card)}
+                    >
                       Delete
                     </Button>
                   </div>
@@ -129,7 +176,9 @@ const Dashboard = () => {
             <Box>
               <Input
                 placeholder="Question"
-                value={dialogType === "add" ? newCard.question : editCard.question}
+                value={
+                  dialogType === "add" ? newCard.question : editCard.question
+                }
                 onChange={(e) => {
                   if (dialogType === "add") {
                     setNewCard({ ...newCard, question: e.target.value });
