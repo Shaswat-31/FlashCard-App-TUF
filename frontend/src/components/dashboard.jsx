@@ -20,7 +20,7 @@ const Dashboard = () => {
 
   const fetchFlashcards = async () => {
     try {
-      const response = await axios.get("https://flashcardsoumya.onrender.com/api/flashcards");
+      const response = await axios.get("https://flashcard-app-tuf.onrender.com/api/flashcards");
       setFlashcards(response.data);
     } catch (error) {
       console.error("Error fetching flashcards:", error);
